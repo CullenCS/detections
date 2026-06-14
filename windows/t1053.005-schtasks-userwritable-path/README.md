@@ -2,7 +2,7 @@
 
 **ATT&CK:** T1053.005 — Scheduled Task (Persistence / Privilege Escalation / Execution)
 **Platform / log source:** Windows process_creation (Sysmon EID 1, or Security 4688 with command-line auditing)
-**Status:** draft
+**Status:** validated
 
 ## The technique (why attackers do this)
 After gaining initial access, attackers create scheduled tasks to survive reboots
@@ -28,16 +28,35 @@ where the scheduled action's binary/script lives in a writable user directory, w
 is the persistence signal.
 
 ## Validation
-<!-- TODO(Cullen): run the technique in your lab and paste the resulting event here,
-then flip Status above to "validated". Suggested test (Atomic Red Team):
 
-    Invoke-AtomicTest T1053.005 -TestNumbers 1,2
+**Sample:** `AutomatedTestingTools/Malware/rundll32_cmd_schtask.evtx`
+(from [EVTX-ATTACK-SAMPLES](https://github.com/sbousseaden/EVTX-ATTACK-SAMPLES))
 
-Then paste the matching Sysmon EID 1 (or Security 4688) event below — at minimum the
-Image, CommandLine, ParentImage, and User fields — and confirm the rule selection
-matched. A screenshot of the alert in Sentinel/Elastic is a strong addition. -->
+**Command run:**
+```
+chainsaw hunt rundll32_cmd_schtask.evtx \
+  --sigma windows/t1053.005-schtasks-userwritable-path/rule.yml \
+  --mapping chainsaw/mappings/sigma-event-logs-all.yml --json
+```
 
-_Pending lab validation. Atomic Red Team test to run: `Invoke-AtomicTest T1053.005 -TestNumbers 1,2`._
+**Result:** `1 Detections found on 1 documents`
+
+**Matched event (Sysmon EID 1, key fields):**
+```json
+{
+  "UtcTime":       "2020-10-23 21:57:36.627",
+  "Image":         "C:\\Windows\\SysWOW64\\schtasks.exe",
+  "CommandLine":   "schtasks  /Create /f /XML C:\\Users\\IEUser\\AppData\\Local\\Temp\\sduchxll.tmp /TN DataUsageHandlers",
+  "ParentImage":   "C:\\Windows\\SysWOW64\\cmd.exe",
+  "ParentCommandLine": "\"C:\\Windows\\System32\\cmd.exe\"  /C schtasks /Create /f /XML C:\\Users\\IEUser\\AppData\\Local\\Temp\\sduchxll.tmp /TN DataUsageHandlers",
+  "User":          "MSEDGEWIN10\\IEUser",
+  "CurrentDirectory": "C:\\Users\\IEUser\\AppData\\Local\\Temp\\tmp1375\\"
+}
+```
+
+The rule triggered on the `/Temp/` path in the `CommandLine` field (`selection_path` matched `\Temp\`).
+The parent chain (`cmd.exe` spawning `schtasks.exe`) is a classic LOLBin delivery pattern
+consistent with the malware loader behavior documented in this sample.
 
 ## False positives & tuning
 Legitimate software does occasionally schedule tasks from user-writable paths —
