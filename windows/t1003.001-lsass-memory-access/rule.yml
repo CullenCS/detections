@@ -1,0 +1,37 @@
+title: LSASS Process Memory Access With Credential-Dumping Access Mask
+id: 1d9a2f50-7c6b-4d2e-9b1a-3e8c4f0a7b21
+status: experimental
+description: >
+  Detects a process opening a handle to lsass.exe with a GrantedAccess mask
+  commonly used to read process memory for credential dumping (e.g. Mimikatz
+  sekurlsa, comsvcs MiniDump). Filters the common benign readers so the
+  remaining hits are high-fidelity.
+references:
+  - https://attack.mitre.org/techniques/T1003/001/
+author: 'Cullen Flynn'
+date: 2026/06/14
+logsource:
+  product: windows
+  category: process_access
+detection:
+  selection:
+    TargetImage|endswith: '\lsass.exe'
+    GrantedAccess:
+      - '0x1010'
+      - '0x1410'
+      - '0x1438'
+      - '0x143a'
+      - '0x1fffff'
+  filter_known_av:
+    SourceImage|endswith:
+      - '\MsMpEng.exe'
+      - '\wmiprvse.exe'
+      - '\taskmgr.exe'
+  condition: selection and not filter_known_av
+falsepositives:
+  - EDR/AV and Windows components legitimately reading lsass; tune the
+    SourceImage allowlist to your environment's real readers before promoting.
+level: high
+tags:
+  - attack.credential-access
+  - attack.t1003.001
