@@ -15,10 +15,11 @@ Data Explorer is in progress.
 | [AWS IAM access key for existing user](cloud/t1098.001-aws-iam-key-created/) | T1098.001 | AWS | draft |
 | [Entra MFA fatigue / push-bombing](cloud/t1621-entra-mfa-fatigue/) | T1621 | Entra ID | draft |
 
-(table grows as rules land — see BACKLOG.md)
+(table grows as rules land; see BACKLOG.md)
 
-**Why these writeups exist:** a rule without tuning notes and validation
-evidence isn't a detection, it's a regex. Each entry shows the full lifecycle:
-threat research → logic → validation against public attack telemetry → FP analysis → coverage honesty.
+**Why these writeups exist:** without tuning notes and validation evidence, a rule
+is just a regex. Each entry walks the full lifecycle: threat research, detection
+logic, validation against public attack telemetry, false-positive analysis, and an
+honest account of the gaps it leaves open.
 
 **Validation:** Windows rules are tested against [EVTX-ATTACK-SAMPLES](https://github.com/sbousseaden/EVTX-ATTACK-SAMPLES) with [Chainsaw](https://github.com/WithSecureLabs/chainsaw); cloud rules against [OTRF Security-Datasets](https://github.com/OTRF/Security-Datasets) in Azure Data Explorer. See [VALIDATION.md](VALIDATION.md).

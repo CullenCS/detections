@@ -1,6 +1,6 @@
 # Windows Service Installed From a User-Writable or Script Path
 
-**ATT&CK:** T1543.003 — Create or Modify System Process: Windows Service (Persistence / Privilege Escalation)
+**ATT&CK:** T1543.003 Create or Modify System Process: Windows Service (Persistence / Privilege Escalation)
 **Platform / log source:** Windows System log, EID 7045 (a service was installed)
 
 **Status:** validated
@@ -10,7 +10,7 @@ A Windows service runs automatically and as SYSTEM, so installing one is a clean
 way to get both persistence and privilege escalation in a single move. Malware
 and post-exploitation frameworks (PsExec-style lateral movement, Cobalt Strike's
 service jobs) register a service whose binary lives wherever the attacker could
-write — typically a user-writable directory — or whose ImagePath is a script
+write (typically a user-writable directory), or whose ImagePath is a script
 interpreter carrying the payload inline.
 
 ## Detection logic
@@ -22,7 +22,7 @@ live in `Program Files` or `System32`; a service pointing at a writable path or
 a LOLBin is the anomaly.
 
 **Field-name note:** Chainsaw exposes the service binary as `ImagePath` directly
-inside `EventData` — confirmed against real telemetry before finalising the rule.
+inside `EventData`, confirmed against real telemetry before finalising the rule.
 The original draft searched for `cmd.exe /c` (with the ` /c` suffix); real corpus
 events showed the ImagePath as bare `cmd.exe` and as `%COMSPEC% /c ...`, so both
 patterns were added to `path_script`.
@@ -41,7 +41,7 @@ chainsaw hunt \
   --json
 ```
 
-**Match 1** — lateral-movement PsExec-style service, `spoolfool` masquerading as
+**Match 1:** lateral-movement PsExec-style service, `spoolfool` masquerading as
 spooler, ImagePath `cmd.exe`:
 ```json
 {
@@ -53,7 +53,7 @@ spooler, ImagePath `cmd.exe`:
 }
 ```
 
-**Match 2** — same session, service renamed `spoolsv` to further blend in,
+**Match 2:** same session, service renamed `spoolsv` to further blend in,
 ImagePath `cmd.exe`:
 ```json
 {
@@ -65,7 +65,7 @@ ImagePath `cmd.exe`:
 }
 ```
 
-**Match 3** — named-pipe impersonation privesc (WinPwnage), ImagePath is an
+**Match 3:** named-pipe impersonation privesc (WinPwnage), ImagePath is an
 inline `%COMSPEC% /c` command writing to a named pipe:
 ```json
 {
@@ -78,7 +78,7 @@ inline `%COMSPEC% /c` command writing to a named pipe:
 ```
 
 ## False positives & tuning
-`\ProgramData\` is the noisy one — some legitimate vendors install services there.
+`\ProgramData\` is the noisy one; some legitimate vendors install services there.
 Tune by allowlisting known-good **service names** and **signed** ImagePaths, and
 keep the script-interpreter selection (a service that *is* powershell/cmd is
 almost never legitimate). Start at high; if ProgramData noise is heavy in your
@@ -86,8 +86,8 @@ estate, split it into its own lower-severity variant.
 
 ## Gaps & evasions (honesty section)
 - An attacker can install the binary to `System32`/`Program Files` first (needs
-  admin) and then register the service from there — this path-based rule won't
-  fire. Pair with service-creation-by-suspicious-parent and binary-signature
+  admin) and then register the service from there. This path-based rule won't
+  fire on that. Pair with service-creation-by-suspicious-parent and binary-signature
   checks.
 - Services can be created via the registry directly (no 7045). Complement with
   Sysmon registry detections on `HKLM\SYSTEM\CurrentControlSet\Services`.

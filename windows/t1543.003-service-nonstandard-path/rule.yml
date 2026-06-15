@@ -4,7 +4,7 @@ status: test
 description: >
   Detects service installation (System EID 7045) where the service binary path
   points at a user-writable directory (AppData, Temp, Public, ProgramData) or is
-  a script interpreter — a common persistence / privilege-escalation pattern.
+  a script interpreter, a common persistence / privilege-escalation pattern.
 references:
   - https://attack.mitre.org/techniques/T1543/003/
 author: 'Cullen Flynn'

@@ -1,4 +1,4 @@
-// T1621 — MFA fatigue / push-bombing: many MFA prompts a user denies in a short
+// T1621: MFA fatigue / push-bombing: many MFA prompts a user denies in a short
 // window, optionally followed by a success (likely fatigue-driven approval).
 let window = 10m;
 let threshold = 5;            // denied/failed MFA prompts within the window

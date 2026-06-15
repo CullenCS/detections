@@ -1,4 +1,4 @@
-// T1098.001 — IAM access key created for an existing user (potential persistence).
+// T1098.001: IAM access key created for an existing user (potential persistence).
 // Flags CreateAccessKey where the actor creates a key for a *different* user,
 // which is the persistence pattern (granting themselves a durable credential on
 // another, often more privileged, identity).
@@ -13,7 +13,7 @@ AWSCloudTrail
 | where isnotempty(TargetUser)
 | where ActorType != "AWSService"                // drop service-linked automation
 | where ActorUser != TargetUser                  // key minted for someone else
-// NOTE: confirm the MFA field in ADX — Sentinel's AWSCloudTrail likely exposes a
+// NOTE: confirm the MFA field in ADX. Sentinel's AWSCloudTrail likely exposes a
 // flattened SessionMfaAuthenticated column rather than the nested path below.
 | project TimeGenerated, ActorUser, ActorType, TargetUser,
           SourceIpAddress, AWSRegion, UserAgent, SessionMfaAuthenticated = tostring(parse_json(UserIdentity).sessionContext.attributes.mfaAuthenticated)

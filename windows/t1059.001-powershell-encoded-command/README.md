@@ -1,6 +1,6 @@
 # PowerShell Encoded Command Execution
 
-**ATT&CK:** T1059.001 — Command and Scripting Interpreter: PowerShell (Execution)
+**ATT&CK:** T1059.001 Command and Scripting Interpreter: PowerShell (Execution)
 **Platform / log source:** Windows process_creation (Sysmon EID 1, or Security 4688 with command-line auditing)
 **Status:** validated
 
@@ -15,7 +15,7 @@ needs it, which is what makes it a useful signal.
 Fires when `powershell.exe`/`pwsh.exe` is launched and the command line contains
 an `-EncodedCommand` form (`-enc`, `-ec`, and spacing/colon variants). PowerShell
 accepts truncated parameter names, so the rule covers the common short forms.
-This deliberately does not try to decode the blob inline — the presence of the
+This deliberately does not try to decode the blob inline. The presence of the
 flag plus context (parent, user) is the trigger; decoding is a triage step.
 
 ## Validation
@@ -49,7 +49,7 @@ chainsaw hunt <corpus> \
 
 Result: `[+] 1 Detections found on 1 documents`
 
-The matching pattern was `' -enc '` — the malware passed its payload as
+The matching pattern was `' -enc '`: the malware passed its payload as
 `powershell.exe -nop -noni -enc <base64blob>`, which the rule catches via the
 space-delimited short form.
 

@@ -1,11 +1,11 @@
 # {{RULE_TITLE}}
 
-**ATT&CK:** {{TECHNIQUE_ID}} — {{TECHNIQUE_NAME}} ({{TACTIC}})
+**ATT&CK:** {{TECHNIQUE_ID}} {{TECHNIQUE_NAME}} ({{TACTIC}})
 **Platform / log source:** {{e.g., Windows process_creation (Sysmon EID 1)}}
 **Status:** draft | validated
 
 ## The technique (why attackers do this)
-{{3–5 sentences: what the attacker gains, when in the kill chain it appears,
+{{3-5 sentences: what the attacker gains, when in the kill chain it appears,
 one real-world campaign reference if known.}}
 
 ## Detection logic

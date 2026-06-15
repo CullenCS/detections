@@ -26,7 +26,7 @@ detection:
       - '%TEMP%'
   condition: selection_img and selection_path
 falsepositives:
-  - Software updaters (Chrome, Teams, Zoom) creating tasks under AppData — tune
+  - Software updaters (Chrome, Teams, Zoom) creating tasks under AppData; tune
     by ParentImage signature status or known-good task name allowlist
 level: medium
 tags:

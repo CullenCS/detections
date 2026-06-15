@@ -1,6 +1,6 @@
 # Scheduled Task Created via Schtasks Executing From User-Writable Path
 
-**ATT&CK:** T1053.005 — Scheduled Task (Persistence / Privilege Escalation / Execution)
+**ATT&CK:** T1053.005 Scheduled Task (Persistence / Privilege Escalation / Execution)
 **Platform / log source:** Windows process_creation (Sysmon EID 1, or Security 4688 with command-line auditing)
 **Status:** validated
 
@@ -9,7 +9,7 @@ After gaining initial access, attackers create scheduled tasks to survive reboot
 and re-establish their foothold on a host. `schtasks.exe /create` is the built-in,
 living-off-the-land way to do this, so it blends into normal Windows activity. The
 tell is *where the task runs from*: malware drops its payload somewhere the current
-user can write — `%AppData%`, `%Temp%`, or `C:\Users\Public` — because it rarely
+user can write (`%AppData%`, `%Temp%`, or `C:\Users\Public`) because it rarely
 has rights to write to `Program Files` or `System32`. Commodity loaders and
 post-exploitation frameworks (and many real-world intrusions documented against
 T1053.005) lean on exactly this pattern.
@@ -18,12 +18,12 @@ T1053.005) lean on exactly this pattern.
 The rule fires on a `process_creation` event where:
 1. the image is `schtasks.exe`, and the command line contains `/create` (a task is
    being registered, not just queried or run), **and**
-2. the command line references a user-writable path — `\AppData\`, `\Temp\`,
+2. the command line references a user-writable path: `\AppData\`, `\Temp\`,
    `\Users\Public\`, or the `%APPDATA%` / `%TEMP%` environment variables.
 
 Both conditions must be true (`selection_img and selection_path`). This deliberately
 ignores task *queries* and *executions* (no `/create`) and tasks whose action runs
-from a system path — those are overwhelmingly legitimate. It catches the common case
+from a system path, which are overwhelmingly legitimate. It catches the common case
 where the scheduled action's binary/script lives in a writable user directory, which
 is the persistence signal.
 
@@ -59,7 +59,7 @@ The parent chain (`cmd.exe` spawning `schtasks.exe`) is a classic LOLBin deliver
 consistent with the malware loader behavior documented in this sample.
 
 ## False positives & tuning
-Legitimate software does occasionally schedule tasks from user-writable paths —
+Legitimate software does occasionally schedule tasks from user-writable paths,
 chiefly per-user auto-updaters (Chrome/Google Update, Microsoft Teams, Zoom,
 Dropbox, Slack) that install under `%LocalAppData%`. Tune by:
 - **ParentImage / signature:** allowlist tasks whose creating process is a *signed*
@@ -74,7 +74,7 @@ promote to high once the vendor-updater noise is filtered.
 
 ## Gaps & evasions (honesty section)
 - **Direct API / COM:** an attacker can register a task via the Task Scheduler COM
-  interface or `schtasks` alternatives, never spawning `schtasks.exe` — this rule
+  interface or `schtasks` alternatives, never spawning `schtasks.exe`. This rule
   won't see that. Complement with a Sysmon EID 1 watch on the Task Scheduler
   service and registry/EID-4698 ("a scheduled task was created") telemetry.
 - **Living in a non-monitored path:** payload staged in a writable directory not in
