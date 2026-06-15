@@ -15,10 +15,15 @@ jobs:
           python-version: "3.11"
 
       - name: Install tooling
-        run: pip install pyyaml yamllint
+        run: pip install pyyaml yamllint sigma-cli
 
       - name: Lint Sigma rule YAML
         run: yamllint -c .yamllint.yml windows/*/rule.yml
 
       - name: Validate rule structure
         run: python tools/validate_rules.py
+
+      - name: Sigma rule validation (official toolchain)
+        # filename validators excluded: this repo uses a folder-per-rule layout
+        # where every file is rule.yml, which is intentional.
+        run: sigma check --fail-on-issues -x filename_length -x duplicate_filename windows/

@@ -1,0 +1,45 @@
+title: PowerShell Script Block Logging Reveals Download/Exec or In-Memory Loading
+id: 7d3c9a16-5b42-4e88-9f0a-2c6e1b8d4a70
+status: experimental
+description: >
+  Detects PowerShell Script Block Logging (EID 4104) where the deobfuscated
+  ScriptBlockText contains download-and-execute or in-memory loading indicators
+  (IEX, Net.WebClient/DownloadString, FromBase64String, reflective assembly load).
+  Script block logging records the decoded script, so this catches payloads that
+  -EncodedCommand or other command-line obfuscation hid from process_creation.
+references:
+  - https://attack.mitre.org/techniques/T1059/001/
+author: 'Cullen Flynn'
+date: 2026/06/15
+logsource:
+  product: windows
+  category: ps_script
+detection:
+  selection_download:
+    ScriptBlockText|contains:
+      - 'IEX'
+      - 'Invoke-Expression'
+      - 'Net.WebClient'
+      - 'DownloadString'
+      - 'DownloadFile'
+      - 'Invoke-WebRequest'
+      - 'Start-BitsTransfer'
+  selection_decode_load:
+    ScriptBlockText|contains:
+      - 'FromBase64String'
+      - 'Reflection.Assembly'
+      - 'Add-Type'
+  selection_inject:
+    ScriptBlockText|contains:
+      - 'VirtualAlloc'
+      - 'WriteProcessMemory'
+      - 'CreateRemoteThread'
+  condition: selection_download or selection_decode_load or selection_inject
+falsepositives:
+  - Admin and install scripts legitimately use Invoke-WebRequest or Add-Type;
+    combine indicators (download plus decode plus inject) and tune by host/user
+    before alerting at high severity.
+level: high
+tags:
+  - attack.execution
+  - attack.t1059.001
