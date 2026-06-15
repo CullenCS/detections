@@ -1,6 +1,6 @@
 title: PowerShell Encoded Command Execution
 id: 9b2e7c14-5a3f-4e88-bb20-6d1c9f4a2e07
-status: validated
+status: experimental
 description: >
   Detects powershell.exe / pwsh.exe launched with an -EncodedCommand argument
   (base64 of a UTF-16LE script). Attackers use -enc to smuggle obfuscated
