@@ -1,0 +1,18 @@
+// T1098.001 — IAM access key created for an existing user (potential persistence).
+// Flags CreateAccessKey where the actor creates a key for a *different* user,
+// which is the persistence pattern (granting themselves a durable credential on
+// another, often more privileged, identity).
+let lookback = 14d;
+AWSCloudTrail
+| where TimeGenerated > ago(lookback)
+| where EventSource == "iam.amazonaws.com" and EventName == "CreateAccessKey"
+| where isempty(ErrorCode)                       // succeeded
+| extend TargetUser = tostring(parse_json(RequestParameters).userName)
+| extend ActorUser  = tostring(UserIdentityUserName)
+| extend ActorType  = tostring(UserIdentityType)
+| where isnotempty(TargetUser)
+| where ActorType != "AWSService"                // drop service-linked automation
+| where ActorUser != TargetUser                  // key minted for someone else
+| project TimeGenerated, ActorUser, ActorType, TargetUser,
+          SourceIpAddress, AWSRegion, UserAgent, SessionMfaAuthenticated = tostring(parse_json(UserIdentity).sessionContext.attributes.mfaAuthenticated)
+| order by TimeGenerated desc
