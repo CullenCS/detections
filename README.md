@@ -1,5 +1,7 @@
 # detections
 
+[![validate-detections](https://github.com/CullenCS/detections/actions/workflows/ci.yml/badge.svg)](https://github.com/CullenCS/detections/actions/workflows/ci.yml)
+
 Production-style detection rules mapped to MITRE ATT&CK, each documented like I'd
 hand it to a SOC: detection logic, log sources, false-positive tuning, and known
 gaps. Windows rules are validated against real attack telemetry
@@ -23,3 +25,5 @@ logic, validation against public attack telemetry, false-positive analysis, and 
 honest account of the gaps it leaves open.
 
 **Validation:** Windows rules are tested against [EVTX-ATTACK-SAMPLES](https://github.com/sbousseaden/EVTX-ATTACK-SAMPLES) with [Chainsaw](https://github.com/WithSecureLabs/chainsaw); cloud rules against [OTRF Security-Datasets](https://github.com/OTRF/Security-Datasets) in Azure Data Explorer. See [VALIDATION.md](VALIDATION.md).
+
+**Continuous validation:** every push runs a CI check ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)): `yamllint` on the Sigma rule files, then a Python validator ([`tools/validate_rules.py`](tools/validate_rules.py)) that enforces the structure I rely on: required Sigma keys, a valid UUID id, a real detection condition, and a writeup beside every rule. A malformed detection fails the build instead of landing on main.

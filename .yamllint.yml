@@ -1,0 +1,10 @@
+# Lint config for the Sigma rule files. Sigma rules are single documents with
+# no '---' start marker and some long description/commandline lines, so those
+# two default rules are relaxed; everything else stays strict.
+extends: default
+
+rules:
+  document-start: disable
+  line-length: disable
+  truthy:
+    check-keys: false
