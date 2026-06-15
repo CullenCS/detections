@@ -1,19 +1,24 @@
 # detections
 
-Production-style detection rules, each validated in a lab against the real
-technique and documented like I'd hand it to a SOC: detection logic, log
-sources, false-positive tuning, and known gaps. Mapped to MITRE ATT&CK.
+Production-style detection rules mapped to MITRE ATT&CK, each documented like I'd
+hand it to a SOC: detection logic, log sources, false-positive tuning, and known
+gaps. Windows rules are validated against real attack telemetry
+(EVTX-ATTACK-SAMPLES, run with Chainsaw); the cloud rules' validation in Azure
+Data Explorer is in progress.
 
 | Rule | Technique | Platform | Status |
 |------|-----------|----------|--------|
-| [Scheduled task from user-writable path](windows/t1053.005-schtasks-userwritable-path/) | T1053.005 | Windows | draft |
+| [Scheduled task from user-writable path](windows/t1053.005-schtasks-userwritable-path/) | T1053.005 | Windows | validated |
+| [LSASS memory access (credential-dumping mask)](windows/t1003.001-lsass-memory-access/) | T1003.001 | Windows | validated |
+| [PowerShell encoded command](windows/t1059.001-powershell-encoded-command/) | T1059.001 | Windows | validated |
+| [Service from user-writable / script path](windows/t1543.003-service-nonstandard-path/) | T1543.003 | Windows | validated |
+| [AWS IAM access key for existing user](cloud/t1098.001-aws-iam-key-created/) | T1098.001 | AWS | draft |
+| [Entra MFA fatigue / push-bombing](cloud/t1621-entra-mfa-fatigue/) | T1621 | Entra ID | draft |
 
 (table grows as rules land — see BACKLOG.md)
 
 **Why these writeups exist:** a rule without tuning notes and validation
 evidence isn't a detection, it's a regex. Each entry shows the full lifecycle:
-threat research → logic → lab validation → FP analysis → coverage honesty.
+threat research → logic → validation against public attack telemetry → FP analysis → coverage honesty.
 
-Lab: <!-- TODO(Cullen): one line describing your lab before pushing public, e.g.
-"Windows Server 2022 + Sysmon (SwiftOnSecurity config) shipped to Microsoft
-Sentinel; attacker box running Atomic Red Team." -->
+**Validation:** Windows rules are tested against [EVTX-ATTACK-SAMPLES](https://github.com/sbousseaden/EVTX-ATTACK-SAMPLES) with [Chainsaw](https://github.com/WithSecureLabs/chainsaw); cloud rules against [OTRF Security-Datasets](https://github.com/OTRF/Security-Datasets) in Azure Data Explorer. See [VALIDATION.md](VALIDATION.md).
