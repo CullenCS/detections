@@ -1,0 +1,8 @@
+# Validation data and tooling live outside this repo (never commit them).
+*.evtx
+*.evt
+*.zip
+chainsaw*
+hayabusa*
+/datasets/
+/detlab/
