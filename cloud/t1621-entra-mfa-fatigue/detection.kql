@@ -1,0 +1,24 @@
+// T1621 — MFA fatigue / push-bombing: many MFA prompts a user denies in a short
+// window, optionally followed by a success (likely fatigue-driven approval).
+let window = 10m;
+let threshold = 5;            // denied/failed MFA prompts within the window
+let denied =
+    SigninLogs
+    | where ResultType == 500121          // "Authentication failed during strong authentication request"
+    | extend Detail = tostring(parse_json(AuthenticationDetails)[0].authenticationStepResultDetail)
+    | summarize DeniedCount = count(),
+                FirstDeny = min(TimeGenerated),
+                LastDeny  = max(TimeGenerated),
+                IPs = make_set(IPAddress, 10)
+        by UserPrincipalName, bin(TimeGenerated, window)
+    | where DeniedCount >= threshold;
+denied
+| join kind=leftouter (
+    SigninLogs
+    | where ResultType == 0               // a successful sign-in...
+    | project UserPrincipalName, SuccessTime = TimeGenerated, SuccessIP = IPAddress
+  ) on UserPrincipalName
+| where isnull(SuccessTime) or (SuccessTime between (FirstDeny .. (LastDeny + 30m)))
+| extend LikelyApproved = isnotempty(SuccessTime)
+| project UserPrincipalName, DeniedCount, FirstDeny, LastDeny, IPs, LikelyApproved, SuccessIP
+| order by DeniedCount desc
