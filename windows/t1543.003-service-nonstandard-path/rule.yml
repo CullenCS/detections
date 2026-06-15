@@ -1,0 +1,40 @@
+title: Windows Service Installed From a User-Writable or Script Path
+id: 4c7d1ab9-3e62-4f15-a0d8-2b9e5c1f8a30
+status: experimental
+description: >
+  Detects service installation (System EID 7045) where the service binary path
+  points at a user-writable directory (AppData, Temp, Public, ProgramData) or is
+  a script interpreter — a common persistence / privilege-escalation pattern.
+references:
+  - https://attack.mitre.org/techniques/T1543/003/
+author: 'Cullen Flynn'
+date: 2026/06/14
+logsource:
+  product: windows
+  service: system
+detection:
+  selection:
+    EventID: 7045
+  path_writable:
+    ImagePath|contains:
+      - '\AppData\'
+      - '\Temp\'
+      - '\Users\Public\'
+      - '\ProgramData\'
+  path_script:
+    ImagePath|contains:
+      - 'powershell'
+      - 'cmd.exe'
+      - '%COMSPEC%'
+      - 'cscript'
+      - 'wscript'
+      - 'rundll32'
+  condition: selection and (path_writable or path_script)
+falsepositives:
+  - Some legitimate software installs services from ProgramData; allowlist known
+    vendor service names / signed binaries before promoting.
+level: high
+tags:
+  - attack.persistence
+  - attack.privilege-escalation
+  - attack.t1543.003
