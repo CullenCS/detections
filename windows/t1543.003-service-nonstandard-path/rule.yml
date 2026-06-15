@@ -1,6 +1,6 @@
 title: Windows Service Installed From a User-Writable or Script Path
 id: 4c7d1ab9-3e62-4f15-a0d8-2b9e5c1f8a30
-status: experimental
+status: test
 description: >
   Detects service installation (System EID 7045) where the service binary path
   points at a user-writable directory (AppData, Temp, Public, ProgramData) or is

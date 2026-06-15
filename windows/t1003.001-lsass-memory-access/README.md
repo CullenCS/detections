@@ -14,7 +14,12 @@ to lsass with read/query rights, so the access *mask* on that handle is the tell
 ## Detection logic
 Fires on a Sysmon EID 10 (ProcessAccess) where `TargetImage` is `lsass.exe` and
 `GrantedAccess` is one of the masks associated with reading process memory
-(`0x1010`, `0x1410`, `0x1438`, `0x143a`, `0x1fffff`). A short allowlist removes
+(`0x1010`, `0x1410`, `0x1438`, `0x143a`, `0x1fffff`). These are the
+credential-dumping masks tracked by the canonical Sigma LSASS-access rule, and
+every one ORs in `PROCESS_VM_READ` (`0x10`): `0x1010` is the minimal Mimikatz
+`sekurlsa` read, the `0x14xx` family adds `PROCESS_QUERY_INFORMATION` plus
+VM-operation/write rights used by several dumpers, and `0x1fffff` is
+`PROCESS_ALL_ACCESS` (procdump and friends). A short allowlist removes
 the most common benign readers (Defender's `MsMpEng.exe`, `wmiprvse.exe`,
 `taskmgr.exe`). The mask-based approach catches handle opens regardless of the
 tool name, which is why it survives renamed binaries.

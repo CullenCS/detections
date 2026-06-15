@@ -1,6 +1,6 @@
 title: Scheduled Task Created via Schtasks Executing From User-Writable Path
 id: 7f3a9c41-2b8d-4e06-9a17-c5d2e8f0b364
-status: experimental
+status: test
 description: >
   Detects schtasks.exe creating a scheduled task whose action executes from a
   user-writable directory (AppData, Temp, Public). Common persistence pattern

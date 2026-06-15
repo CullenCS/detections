@@ -1,6 +1,6 @@
 title: LSASS Process Memory Access With Credential-Dumping Access Mask
 id: 1d9a2f50-7c6b-4d2e-9b1a-3e8c4f0a7b21
-status: experimental
+status: test
 description: >
   Detects a process opening a handle to lsass.exe with a GrantedAccess mask
   commonly used to read process memory for credential dumping (e.g. Mimikatz

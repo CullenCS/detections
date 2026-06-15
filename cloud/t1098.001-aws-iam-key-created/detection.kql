@@ -13,6 +13,8 @@ AWSCloudTrail
 | where isnotempty(TargetUser)
 | where ActorType != "AWSService"                // drop service-linked automation
 | where ActorUser != TargetUser                  // key minted for someone else
+// NOTE: confirm the MFA field in ADX — Sentinel's AWSCloudTrail likely exposes a
+// flattened SessionMfaAuthenticated column rather than the nested path below.
 | project TimeGenerated, ActorUser, ActorType, TargetUser,
           SourceIpAddress, AWSRegion, UserAgent, SessionMfaAuthenticated = tostring(parse_json(UserIdentity).sessionContext.attributes.mfaAuthenticated)
 | order by TimeGenerated desc

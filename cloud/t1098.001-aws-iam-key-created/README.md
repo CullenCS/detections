@@ -28,6 +28,8 @@ state that and validate the field logic against a sample CreateAccessKey event. 
 
 _Pending validation in Azure Data Explorer against OTRF Security-Datasets AWS CloudTrail telemetry (see [/VALIDATION.md](../../VALIDATION.md))._
 
+_Field note to confirm in ADX: Sentinel's `AWSCloudTrail` table pre-flattens `userIdentity`, so the MFA flag is likely the dedicated `SessionMfaAuthenticated` column rather than `parse_json(UserIdentity).sessionContext.attributes.mfaAuthenticated` — verify against the real schema and adjust the `project` during validation._
+
 ## False positives & tuning
 Admins and IAM automation legitimately create keys. Tune by allowlisting known
 provisioning principals (your IaC/CI roles), and treat **actor != target** plus
