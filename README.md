@@ -1,4 +1,4 @@
-d# Detections
+Detections
 
 [![validate-detections](https://github.com/CullenCS/detections/actions/workflows/ci.yml/badge.svg)](https://github.com/CullenCS/detections/actions/workflows/ci.yml)
 
